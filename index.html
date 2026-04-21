@@ -1,1 +1,536 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thesisanmeldung – Digital Health Communication</title>
+  <style>
+/* ── Reset & tokens ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue:        #003366;
+  --blue-mid:    #0055a5;
+  --blue-light:  #e8eff8;
+  --green:       #2e7d4f;
+  --gray-50:     #f8f9fb;
+  --gray-100:    #f1f3f6;
+  --gray-300:    #d1d5db;
+  --gray-500:    #6b7280;
+  --gray-700:    #374151;
+  --red:         #c0392b;
+  --white:       #ffffff;
+
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   14px;
+  --shadow:      0 2px 16px rgba(0,0,0,.08);
+  --transition:  .18s ease;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+html { font-size: 16px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  min-height: 100dvh;
+  line-height: 1.55;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+header {
+  background: var(--blue);
+  padding: .9rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 6px rgba(0,0,0,.25);
+}
+.header-inner { max-width: 720px; margin: 0 auto; }
+.uni   { font-size: .78rem; color: rgba(255,255,255,.7); letter-spacing: .02em; }
+.chair { font-size: 1rem;   color: var(--white); font-weight: 600; margin-top: 1px; }
+
+/* ── Main layout ───────────────────────────────────────────────────────────── */
+main { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* ── Card ──────────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 2rem 2.25rem;
+}
+@media (max-width: 520px) { .card { padding: 1.5rem 1.25rem; } }
+
+h1 {
+  font-size: 1.55rem;
+  color: var(--blue);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.subtitle {
+  color: var(--gray-500);
+  font-size: .88rem;
+  margin-top: .3rem;
+  margin-bottom: .25rem;
+}
+
+/* ── Form sections ─────────────────────────────────────────────────────────── */
+.form-section {
+  border-top: 1px solid var(--gray-300);
+  padding-top: 1.6rem;
+  margin-top: 1.6rem;
+}
+.form-section h2 {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin-bottom: 1.1rem;
+}
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: var(--white);
+  font-size: .75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Radio cards ───────────────────────────────────────────────────────────── */
+.radio-row { display: flex; gap: .85rem; flex-wrap: wrap; }
+
+.radio-card {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  flex: 1;
+  min-width: 160px;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius);
+  padding: .85rem 1rem;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  user-select: none;
+}
+.radio-card:has(input:checked) {
+  border-color: var(--blue-mid);
+  background: var(--blue-light);
+}
+.radio-card input[type="radio"] { display: none; }
+
+.rc-box {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-300);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: border-color var(--transition);
+}
+.radio-card:has(input:checked) .rc-box { border-color: var(--blue-mid); }
+
+.rc-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--blue-mid);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.radio-card:has(input:checked) .rc-dot { opacity: 1; }
+
+.rc-label { display: flex; flex-direction: column; gap: .1rem; }
+.rc-label strong { font-size: .95rem; color: var(--gray-700); }
+.rc-label small  { font-size: .78rem; color: var(--gray-500); }
+
+/* ── Text fields ───────────────────────────────────────────────────────────── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 1rem;
+}
+@media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+
+.field { display: flex; flex-direction: column; gap: .35rem; }
+
+label {
+  font-size: .83rem;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+.req  { color: var(--red); }
+.hint { font-weight: 400; color: var(--gray-500); }
+
+input[type="text"], textarea {
+  width: 100%;
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  padding: .6rem .8rem;
+  font-size: .95rem;
+  font-family: inherit;
+  color: var(--gray-700);
+  background: var(--white);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+input[type="text"]:focus, textarea:focus {
+  border-color: var(--blue-mid);
+  box-shadow: 0 0 0 3px rgba(0,85,165,.12);
+}
+input.invalid, textarea.invalid { border-color: var(--red); }
+textarea { resize: vertical; line-height: 1.5; }
+
+/* ── Info box (read-only fields) ───────────────────────────────────────────── */
+.info-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1rem;
+  margin-top: 1rem;
+}
+.info-row { display: flex; gap: .5rem; padding: .25rem 0; font-size: .85rem; }
+.info-key {
+  color: var(--gray-500);
+  min-width: 115px;
+  flex-shrink: 0;
+}
+.info-val { font-weight: 500; color: var(--gray-700); }
+
+/* ── Checkbox ──────────────────────────────────────────────────────────────── */
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  cursor: pointer;
+  font-size: .88rem;
+  line-height: 1.55;
+  user-select: none;
+}
+.check-row input[type="checkbox"] { display: none; }
+.check-box {
+  width: 20px; height: 20px;
+  min-width: 20px;
+  border: 2px solid var(--gray-300);
+  border-radius: 4px;
+  margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition), border-color var(--transition);
+}
+.check-row:has(input:checked) .check-box {
+  background: var(--blue-mid);
+  border-color: var(--blue-mid);
+}
+.check-row:has(input:checked) .check-box::after {
+  content: '';
+  display: block;
+  width: 5px; height: 9px;
+  border: 2px solid white;
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.check-label { color: var(--gray-700); }
+
+/* ── Signature ─────────────────────────────────────────────────────────────── */
+.sig-hint {
+  font-size: .85rem;
+  color: var(--gray-500);
+  margin-bottom: .65rem;
+}
+.sig-wrap {
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  overflow: hidden;
+  cursor: crosshair;
+}
+#sig-canvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+  touch-action: none;
+}
+.sig-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: .4rem;
+}
+.sig-label-text { font-size: .78rem; color: var(--gray-500); }
+
+/* ── Error banner ──────────────────────────────────────────────────────────── */
+.error-banner {
+  background: #fdf2f2;
+  border: 1px solid #f5c6c6;
+  color: var(--red);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1rem;
+  font-size: .875rem;
+  margin-top: 1rem;
+}
+
+/* ── Submit ────────────────────────────────────────────────────────────────── */
+.submit-row { margin-top: 1.75rem; }
+.submit-note {
+  font-size: .78rem;
+  color: var(--gray-500);
+  text-align: center;
+  margin-top: .6rem;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), opacity var(--transition);
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--blue);
+  color: var(--white);
+  font-size: 1rem;
+  padding: .85rem 1.5rem;
+  width: 100%;
+}
+.btn-primary:hover:not(:disabled) { background: var(--blue-mid); }
+
+.btn-ghost {
+  background: none;
+  color: var(--gray-500);
+  font-size: .8rem;
+  padding: .35rem .65rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+}
+.btn-ghost:hover { background: var(--gray-100); }
+
+.btn-outline {
+  background: var(--white);
+  color: var(--blue);
+  border: 2px solid var(--blue);
+  font-size: .95rem;
+  padding: .7rem 1.5rem;
+  margin-top: .5rem;
+}
+.btn-outline:hover { background: var(--blue-light); }
+
+/* Spinner */
+.btn-spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,.35);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Success card ──────────────────────────────────────────────────────────── */
+.success-card { text-align: center; padding: 3rem 2rem; }
+.success-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--white);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+.success-card h2 { color: var(--blue); font-size: 1.4rem; margin-bottom: .75rem; }
+.success-card p  { color: var(--gray-500); font-size: .9rem; max-width: 420px; margin: 0 auto 1.5rem; }
+
+/* ── Utilities ─────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="uni">Universität Augsburg</div>
+      <div class="chair">Lehrstuhl Digital Health Communication</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── Success screen (hidden until submission) ──────────────────────── -->
+    <div id="success-screen" class="hidden">
+      <div class="card success-card">
+        <div class="success-icon">✓</div>
+        <h2>Anmeldung eingereicht!</h2>
+        <p>
+          Ihre Thesisanmeldung wurde erfolgreich übermittelt und wird
+          geprüft. Sie erhalten bei Bedarf eine Rückmeldung von
+          Prof. Dr. Scherr.
+        </p>
+        <button class="btn btn-outline" onclick="location.reload()">
+          Neue Anmeldung
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Main form ─────────────────────────────────────────────────────── -->
+    <div id="form-screen">
+      <div class="card">
+        <h1>Anmeldung Bachelor-&shy;/&shy;Masterarbeit</h1>
+        <p class="subtitle">
+          Digital Health Communication &nbsp;·&nbsp;
+          Lehrstuhl Prof. Dr. Sebastian Scherr
+        </p>
+
+        <form id="thesis-form" novalidate>
+
+          <!-- 1 · Abschluss ------------------------------------------------ -->
+          <section class="form-section">
+            <h2><span class="step">1</span> Abschluss</h2>
+            <div class="radio-row" role="radiogroup" aria-label="Abschluss">
+              <label class="radio-card">
+                <input type="radio" name="abschluss" value="BA" required>
+                <span class="rc-box">
+                  <span class="rc-dot"></span>
+                </span>
+                <span class="rc-label">
+                  <strong>Bachelor</strong>
+                  <small>B.A. Medien und Kommunikation</small>
+                </span>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="abschluss" value="MA">
+                <span class="rc-box">
+                  <span class="rc-dot"></span>
+                </span>
+                <span class="rc-label">
+                  <strong>Master</strong>
+                  <small>M.A. Medien und Kommunikation</small>
+                </span>
+              </label>
+            </div>
+          </section>
+
+          <!-- 2 · Persönliche Daten ---------------------------------------- -->
+          <section class="form-section">
+            <h2><span class="step">2</span> Persönliche Daten</h2>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="name">Name, Vorname(n) <span class="req">*</span></label>
+                <input type="text" id="name" name="name"
+                       placeholder="z.&thinsp;B. Müller, Anna Maria"
+                       autocomplete="name" required>
+              </div>
+              <div class="field field--narrow">
+                <label for="matrikel">Matrikelnummer <span class="req">*</span></label>
+                <input type="text" id="matrikel" name="matrikel"
+                       placeholder="7-stellig"
+                       inputmode="numeric" pattern="\d{7}" maxlength="7" required>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <div class="info-row">
+                <span class="info-key">Studiengang</span>
+                <span class="info-val">Medien und Kommunikation</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Erstprüfer/in</span>
+                <span class="info-val">Prof. Dr. Sebastian Scherr</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Lehrstuhl</span>
+                <span class="info-val">Digital Health Communication</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Zweitprüfer/in</span>
+                <span class="info-val">Prof. Dr. Jeffrey Wimmer</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3 · Thema ---------------------------------------------------- -->
+          <section class="form-section">
+            <h2><span class="step">3</span> Thema der Arbeit</h2>
+            <div class="field">
+              <label for="thema">
+                Arbeitstitel <span class="req">*</span>
+                <span class="hint">– bitte vollständig und klar lesbar</span>
+              </label>
+              <textarea id="thema" name="thema" rows="3"
+                        placeholder="Vollständiger Arbeitstitel Ihrer Bachelor- oder Masterarbeit"
+                        required></textarea>
+            </div>
+          </section>
+
+          <!-- 4 · Datenkontrolle ------------------------------------------- -->
+          <section class="form-section">
+            <h2><span class="step">4</span> Bestätigung</h2>
+            <label class="check-row">
+              <input type="checkbox" id="confirm" required>
+              <span class="check-box"></span>
+              <span class="check-label">
+                Ich habe meine Daten (Vorname/n, Name, Geburtstag, Geburtsort
+                und Anschrift) auf Richtigkeit in&nbsp;Studis&nbsp;/&nbsp;VIBS überprüft.
+              </span>
+            </label>
+          </section>
+
+          <!-- 5 · Unterschrift --------------------------------------------- -->
+          <section class="form-section">
+            <h2><span class="step">5</span> Unterschrift</h2>
+            <p class="sig-hint">
+              Bitte unterschreiben Sie mit Maus, Trackpad oder Finger
+              (bei Touch&shy;geräten) im Feld unten.
+            </p>
+            <div class="sig-wrap" id="sig-wrap">
+              <canvas id="sig-canvas" aria-label="Unterschriftsfeld"></canvas>
+            </div>
+            <div class="sig-footer">
+              <span class="sig-label-text">Unterschrift der / des Studierenden</span>
+              <button type="button" id="clear-btn" class="btn btn-ghost">
+                Löschen
+              </button>
+            </div>
+          </section>
+
+          <!-- Error banner -------------------------------------------------- -->
+          <div id="error-banner" class="error-banner hidden" role="alert"></div>
+
+          <!-- Submit --------------------------------------------------------- -->
+          <div class="submit-row">
+            <button type="submit" id="submit-btn" class="btn btn-primary">
+              <span class="btn-label">PDF erstellen &amp; einreichen</span>
+              <span class="btn-spinner hidden" aria-hidden="true"></span>
+            </button>
+            <p class="submit-note">
+              Das ausgefüllte und unterschriebene PDF wird automatisch an
+              Prof. Dr. Scherr weitergeleitet.
+            </p>
+          </div>
+
+        </form>
+      </div><!-- .card -->
+    </div><!-- #form-screen -->
+
+  </main>
+
+  <!-- CDN libraries -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
 
